@@ -1,0 +1,119 @@
+ <html>
+ <head>
+ 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+ 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+ 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+ 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+ 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+
+ 	<script type="text/javascript">
+ 		google.charts.load('current', {'packages':['corechart', 'bar']});
+ 		google.charts.setOnLoadCallback(draw);
+
+ 		function draw() {
+
+ 			$.get("stats.csv", function(csvString) {
+
+ 				var data = csvToData(csvString);
+
+ 				var options = {
+ 					curveType: 'function',
+ 					legend: { position: 'right' }
+ 				};
+
+ 				var curve_chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+ 				curve_chart.draw(data, options);
+
+ 				var bar_chart = new google.charts.Bar(document.getElementById('bar_chart'));
+ 				bar_chart.draw(data, google.charts.Bar.convertOptions(options));
+
+
+ 				tdata = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+ 				tdata.shift();
+ 				$('#speed_table tbody').find('tr').remove();
+ 				tdata.forEach(function(ar) {
+ 					$('#speed_table tbody').append("<tr><td>" + ar[0] + "</td><td>" + ar[1] + "</td><td>" + ar[2] + "</td><td>" + ar[3] + "</td><td>" + ar[4] + "</td><td>" + ar[5] + "</td><td>" + ar[6] + "</td><td>" + ar[7] + "</td><td>" + ar[8] + '</td><td><a href="' + ar[9] + '" target="_blank"><i class="material-icons">share</i></a></li></td></tr>');
+ 				});
+ 			});
+ 		}
+
+
+ 		function csvToData(csvString) {
+ 			var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+ 			darray = [["Date", "Download (Mbps)", "Upload (Mbps)"]]
+ 			arrayData.shift();
+ 			arrayData.forEach(function(ar) {
+ 				darray.push([ar[0], ar[7], ar[8]])
+ 			});
+ 			return google.visualization.arrayToDataTable(darray);
+ 		}
+
+ 	</script>
+
+ 	<script type="text/javascript">
+ 		$(document).ready(function(){
+ 			$('ul.tabs').tabs({ onShow: function(tab) { 
+ 				draw();;
+ 			} });
+ 		});
+ 	</script>
+
+ </head>
+ <body>
+ 	<div class="container">
+ 		<div class="row">
+ 			<div class="col s12">
+ 				<h1 class="center-align"><span class="red-text text-lighten-1">ZSpeedTest</span></h1>
+ 				<ul class="tabs tabs-fixed-width">
+ 					<li class="tab col s4"><a href="#curve_chart">Lines</a></li>
+ 					<li class="tab col s4"><a  href="#bar_chart">Bars</a></li>
+ 					<li class="tab col s4"><a  href="#table">Table</a></li>
+ 				</ul>
+ 			</div>
+ 		</div>
+ 		<div id="curve_chart" class="col s12" style="width: 900px; height: 500px"></div>
+ 		<div id="bar_chart" class="col s12" style="width: 900px; height: 500px"></div>
+ 		<div id="table" class="col s12">
+ 			<table class="highlight responsive-table centered" style="width: 100%;" id="speed_table">
+ 				<thead>
+ 					<tr>
+ 						<th>Start</th>
+ 						<th>Stop</th>
+ 						<th>From</th>
+ 						<th>From IP</th>
+ 						<th>Server</th>
+ 						<th>distance (km)</th>
+ 						<th>Ping (ms)</th>
+ 						<th>Download (Mbps)</th>
+ 						<th>Ubload (Mbps)</th>
+ 						<th>Share url</th>
+ 					</tr>
+ 				</thead>
+
+ 				<tbody>
+ 				</tbody>
+ 			</table>
+ 		</div>
+ 	</div>
+ 	<br><br><br>
+
+ 	<div class="fixed-action-btn">
+ 		<a class="btn-floating btn-large red" >
+ 			<i class="large material-icons">menu</i>
+ 		</a>
+ 		<ul>
+ 			<li><a class="btn-floating red" href="stats.csv"><i class="material-icons">cloud_download</i></a></li>
+ 		</ul>
+ 	</div>
+
+ 	<footer class="page-footer">
+ 		<div class="footer-copyright">
+ 			<div class="container">
+ 				Powered by <a href="https://github.com/HenrikBengtsson/speedtest-cli-extras" target="_blank"><span class=" red-text text-darken-4">speedtest-csv</span></a> and <a href="https://github.com/sivel/speedtest-cli" target="_blank"><span class=" red-text text-darken-4">speedtest-cli</span></a>
+ 				<a class="grey-text text-lighten-4 right" href="https://github.com/charlyhue/zspeedtest" target="_blank">GitHub</a>
+ 			</div>
+ 		</div>
+ 	</footer>
+ </body>
+ </html>
